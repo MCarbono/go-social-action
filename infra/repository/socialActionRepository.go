@@ -94,8 +94,8 @@ func (r *SocialActionRepositoryPostgres) Delete(ctx context.Context, ID string) 
 
 func (r *SocialActionRepositoryPostgres) Update(ctx context.Context, socialAction *entity.SocialAction) error {
 	_, err := r.DB.Exec(
-		`UPDATE social_actions SET name = $1 organizer = $2 description = $3 street_line = $4,
-		street_number = $5, neighborhood = $6, city = $7 updated_at = $8 WHERE id = $9`,
+		`UPDATE social_actions SET name = $1, organizer = $2, description = $3, street_line = $4,
+		street_number = $5, neighborhood = $6, city = $7, updated_at = $8 WHERE id = $9`,
 		socialAction.Name, socialAction.Organizer, socialAction.Description, socialAction.Address.StreetLine, socialAction.Address.StreetNumber,
 		socialAction.Address.Neighborhood, socialAction.Address.City, socialAction.UpdatedAt, socialAction.ID,
 	)
