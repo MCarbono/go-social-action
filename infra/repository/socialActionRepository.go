@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"go-social-action/domain/entity"
 )
 
@@ -42,6 +41,21 @@ func (r *SocialActionRepositoryPostgres) Create(ctx context.Context, socialActio
 	return nil
 }
 
+func (r *SocialActionRepositoryPostgres) Delete(ctx context.Context, ID string) error {
+	_, err := r.DB.Exec("DELETE FROM social_actions WHERE id = $1", ID)
+	return err
+}
+
+func (r *SocialActionRepositoryPostgres) Update(ctx context.Context, socialAction *entity.SocialAction) error {
+	_, err := r.DB.Exec(
+		`UPDATE social_actions SET name = $1, organizer = $2, description = $3, street_line = $4,
+		street_number = $5, neighborhood = $6, city = $7, updated_at = $8 WHERE id = $9`,
+		socialAction.Name, socialAction.Organizer, socialAction.Description, socialAction.Address.StreetLine, socialAction.Address.StreetNumber,
+		socialAction.Address.Neighborhood, socialAction.Address.City, socialAction.UpdatedAt, socialAction.ID,
+	)
+	return err
+}
+
 func (r *SocialActionRepositoryPostgres) FindByID(ctx context.Context, ID string) (*entity.SocialAction, error) {
 	var socialActionModel SocialActionModel
 	row := r.DB.QueryRow(`SELECT * FROM social_actions WHERE id = $1`, ID)
@@ -52,7 +66,6 @@ func (r *SocialActionRepositoryPostgres) FindByID(ctx context.Context, ID string
 	}
 	rows, err := r.DB.Query("SELECT * FROM social_actions_volunteers WHERE social_action_id = $1", socialActionModel.ID)
 	if err != nil {
-		fmt.Println("Err aq", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -87,17 +100,56 @@ func (r *SocialActionRepositoryPostgres) FindByID(ctx context.Context, ID string
 	return socialAction, nil
 }
 
-func (r *SocialActionRepositoryPostgres) Delete(ctx context.Context, ID string) error {
-	_, err := r.DB.Exec("DELETE FROM social_actions WHERE id = $1", ID)
-	return err
-}
-
-func (r *SocialActionRepositoryPostgres) Update(ctx context.Context, socialAction *entity.SocialAction) error {
-	_, err := r.DB.Exec(
-		`UPDATE social_actions SET name = $1, organizer = $2, description = $3, street_line = $4,
-		street_number = $5, neighborhood = $6, city = $7, updated_at = $8 WHERE id = $9`,
-		socialAction.Name, socialAction.Organizer, socialAction.Description, socialAction.Address.StreetLine, socialAction.Address.StreetNumber,
-		socialAction.Address.Neighborhood, socialAction.Address.City, socialAction.UpdatedAt, socialAction.ID,
-	)
-	return err
+func (r *SocialActionRepositoryPostgres) FindAll(ctx context.Context) ([]*entity.SocialAction, error) {
+	rows, err := r.DB.Query("SELECT * FROM social_actions;")
+	if err != nil {
+		return nil, err
+	}
+	var socialActions = make([]*entity.SocialAction, 0)
+	for rows.Next() {
+		var socialActionModel SocialActionModel
+		if err := rows.Scan(&socialActionModel.ID, &socialActionModel.Name, &socialActionModel.Organizer,
+			&socialActionModel.Description, &socialActionModel.StreetLine, &socialActionModel.StreetNumber,
+			&socialActionModel.Neighborhood, &socialActionModel.City, &socialActionModel.CreatedAt, &socialActionModel.UpdatedAt); err != nil {
+			return nil, err
+		}
+		rowsSocialActionVolunteers, err := r.DB.Query("SELECT * FROM social_actions_volunteers WHERE social_action_id = $1", socialActionModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer rowsSocialActionVolunteers.Close()
+		var socialActionVolunteersModel []SocialActionVolunteerModel
+		for rowsSocialActionVolunteers.Next() {
+			var socialActionVolunteerModel SocialActionVolunteerModel
+			err := rowsSocialActionVolunteers.Scan(&socialActionVolunteerModel.ID, &socialActionVolunteerModel.SocialActionID, &socialActionVolunteerModel.FirstName,
+				&socialActionVolunteerModel.LastName, &socialActionVolunteerModel.Neighborhood, &socialActionVolunteerModel.City)
+			if err != nil {
+				return nil, err
+			}
+			socialActionVolunteersModel = append(socialActionVolunteersModel, socialActionVolunteerModel)
+		}
+		if rowsSocialActionVolunteers.Err() != nil {
+			return nil, err
+		}
+		socialActionsVolunteers := make([]*entity.SocialActionVolunteer, len(socialActionVolunteersModel))
+		for i := 0; i < len(socialActionsVolunteers); i++ {
+			socialActionsVolunteers[i] = entity.NewSocialActionVolunteer(
+				socialActionVolunteersModel[i].ID, socialActionVolunteersModel[i].SocialActionID,
+				socialActionVolunteersModel[i].FirstName, socialActionVolunteersModel[i].LastName,
+				socialActionVolunteersModel[i].Neighborhood, socialActionVolunteersModel[i].City,
+			)
+		}
+		socialActionAddress := entity.NewAddress(socialActionModel.StreetLine, socialActionModel.StreetNumber, socialActionModel.Neighborhood, socialActionModel.City)
+		socialAction := entity.NewSocialAction(
+			socialActionModel.ID, socialActionModel.Name, socialActionModel.Organizer,
+			socialActionModel.Description, socialActionAddress,
+			socialActionModel.CreatedAt, socialActionModel.UpdatedAt,
+		)
+		socialAction.AddSocialActionVolunteers(socialActionsVolunteers)
+		socialActions = append(socialActions, socialAction)
+	}
+	if rows.Err() != nil {
+		return nil, err
+	}
+	return socialActions, nil
 }
