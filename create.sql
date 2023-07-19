@@ -26,7 +26,7 @@ CREATE TABLE social_actions (
 );
 
 CREATE TABLE social_actions_volunteers (
-    id TEXT PRIMARY KEY,
+    id TEXT,
     social_action_id TEXT REFERENCES social_actions (id) ON DELETE CASCADE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
