@@ -33,31 +33,3 @@ CREATE TABLE social_actions_volunteers (
     neighborhood TEXT,
     city TEXT
 );
-
--- type SocialActionVolunteer struct {
--- 	ID           string
--- 	FirstName    string
--- 	LastName     string
--- 	Neighborhood string
--- 	City         string
--- 	CreatedAt    time.Time
--- 	UpdatedAt    time.Time
--- }
-
--- type SocialAction struct {
--- 	ID                    string
--- 	Name                  string
--- 	Organizer             string
--- 	Address               Address
--- 	Description           string
--- 	SocialActionVolunteer []SocialActionVolunteer
--- }
-
--- type Address struct {
--- 	StreetLine   string
--- 	StreetNumber string
--- 	Neighborhood string
--- 	City         string
--- 	State        string
--- }
-
