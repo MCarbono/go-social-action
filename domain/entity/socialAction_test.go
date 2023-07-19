@@ -210,7 +210,6 @@ func TestSocialAction_UpdateNeighborhood(t *testing.T) {
 		t.Errorf("Updated Social Action name mismatch (-want +got):\n%v", diff)
 	}
 }
-
 func TestSocialAction_UpdateCity(t *testing.T) {
 	newCity := "city updated"
 	want := NewSocialAction(
