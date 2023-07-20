@@ -3,30 +3,30 @@ package entity
 import "time"
 
 type SocialAction struct {
-	ID                    string
-	Name                  string
-	Organizer             string
-	Description           string
-	Address               *Address
-	SocialActionVolunteer []*SocialActionVolunteer
-	CreatedAt             time.Time
-	UpdatedAt             time.Time
+	ID                    string                   `json:"id"`
+	Name                  string                   `json:"name"`
+	Organizer             string                   `json:"organizer"`
+	Description           string                   `json:"description"`
+	Address               *Address                 `json:"address"`
+	SocialActionVolunteer []*SocialActionVolunteer `json:"social_action_volunteers"`
+	CreatedAt             time.Time                `json:"created_at"`
+	UpdatedAt             time.Time                `json:"updated_at"`
 }
 
 type Address struct {
-	StreetLine   string
-	StreetNumber string
-	Neighborhood string
-	City         string
+	StreetLine   string `json:"street_line"`
+	StreetNumber string `json:"street_number"`
+	Neighborhood string `json:"neighborhood"`
+	City         string `json:"city"`
 }
 
 type SocialActionVolunteer struct {
-	ID             string
-	SocialActionID string
-	FirstName      string
-	LastName       string
-	Neighborhood   string
-	City           string
+	ID             string `json:"id"`
+	SocialActionID string `json:"social_action_id"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
+	Neighborhood   string `json:"neighborhoor"`
+	City           string `json:"city"`
 }
 
 func NewAddress(streetLine, streetNumber, neighborhood, city string) *Address {
