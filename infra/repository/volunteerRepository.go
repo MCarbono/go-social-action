@@ -30,7 +30,7 @@ func (r *VolunteerRepositoryPostgres) FindByID(ctx context.Context, ID string) (
 	row := r.DB.QueryRow(`SELECT * FROM volunteers WHERE id = $1`, ID)
 	if err := row.Scan(&model.ID, &model.FirstName, &model.LastName, &model.Neighborhood, &model.City, &model.CreatedAt, &model.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, appError.NotFoundError{Message: "social action not found"}
+			return nil, appError.NotFoundError{Message: "volunteer not found"}
 		}
 		return nil, err
 	}

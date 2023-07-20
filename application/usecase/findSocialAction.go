@@ -19,9 +19,5 @@ func NewFindSocialActionUseCase(
 }
 
 func (uc *FindSocialActionUseCase) Execute(ctx context.Context, ID string) (*entity.SocialAction, error) {
-	socialAction, err := uc.socialActionRepository.FindByID(ctx, ID)
-	if err != nil {
-		return nil, err
-	}
-	return socialAction, nil
+	return uc.socialActionRepository.FindByID(ctx, ID)
 }

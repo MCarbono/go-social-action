@@ -16,6 +16,7 @@ func New(volunteerController controllers.VolunteerController) http.Handler {
 	r.Use(middleware.ContentTypeResponse)
 	r.Route("/volunteers", func(r chi.Router) {
 		r.Post("/", volunteerController.Create)
+		r.Get("/{id}", volunteerController.GetByID)
 	})
 	return r
 }

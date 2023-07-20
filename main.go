@@ -27,6 +27,7 @@ func main() {
 	volunteerRepository := repository.NewVolunteerRepositoryPostgres(db)
 	volunteerController := controllers.VolunteerController{
 		CreateVolunteerUseCase: usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator),
+		FindVolunteerUseCase:   usecase.NewFindVolunteerUseCase(volunteerRepository),
 	}
 	r := router.New(volunteerController)
 	fmt.Printf("Starting the server on port %v\n", cfg.ServerPort)
