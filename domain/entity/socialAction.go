@@ -65,45 +65,42 @@ func NewSocialAction(ID, name, organizer, description string, address *Address, 
 }
 
 func (s *SocialAction) AddSocialActionVolunteers(volunteers []*SocialActionVolunteer) {
-	s.SocialActionVolunteer = append(s.SocialActionVolunteer, volunteers...)
+	s.SocialActionVolunteer = volunteers
+}
+
+func (s *SocialAction) AddSocialActionVolunteer(volunteer *SocialActionVolunteer) {
+	s.SocialActionVolunteer = append(s.SocialActionVolunteer, volunteer)
 }
 
 func (s *SocialAction) UpdateName(name string) {
 	s.Name = name
-	s.updated()
 }
 
 func (s *SocialAction) UpdateOrganizer(organizer string) {
 	s.Organizer = organizer
-	s.updated()
 }
 
 func (s *SocialAction) UpdateDescription(description string) {
 	s.Description = description
-	s.updated()
 }
 
 func (s *SocialAction) UpdateStreetLine(streetLine string) {
 	s.Address.StreetLine = streetLine
-	s.updated()
 }
 
 func (s *SocialAction) UpdateStreetNumber(streetNumber string) {
 	s.Address.StreetNumber = streetNumber
-	s.updated()
 }
 
 func (s *SocialAction) UpdateNeighborhood(neighborhood string) {
 	s.Address.Neighborhood = neighborhood
-	s.updated()
 }
 
 func (s *SocialAction) UpdateCity(city string) {
 	s.Address.City = city
-	s.updated()
 }
 
-func (s *SocialAction) updated() {
+func (s *SocialAction) Updated() {
 	s.UpdatedAt = time.Now().UTC()
 }
 

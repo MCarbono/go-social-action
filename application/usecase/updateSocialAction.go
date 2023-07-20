@@ -3,17 +3,21 @@ package usecase
 import (
 	"context"
 	"go-social-action/application/repository"
+	"go-social-action/domain/entity"
 )
 
 type UpdateSocialActionUseCase struct {
 	socialActionRepository repository.SocialActionRepository
+	volunteerRepository    repository.VolunteerRepository
 }
 
 func NewUpdateSocialActionUseCase(
 	socialActionRepository repository.SocialActionRepository,
+	volunteerRepository repository.VolunteerRepository,
 ) *UpdateSocialActionUseCase {
 	return &UpdateSocialActionUseCase{
 		socialActionRepository: socialActionRepository,
+		volunteerRepository:    volunteerRepository,
 	}
 }
 
@@ -52,9 +56,18 @@ func (uc *UpdateSocialActionUseCase) Execute(ctx context.Context, ID string, inp
 					input.SocialActionsVolunteers[i].Neighborhood, input.SocialActionsVolunteers[i].City)
 				continue
 			}
+			volunteer, err := uc.volunteerRepository.FindByID(ctx, input.SocialActionsVolunteers[i].ID)
+			if err != nil {
+				return err
+			}
+			socialActionVolunteer = entity.NewSocialActionVolunteer(
+				volunteer.ID, socialAction.ID, volunteer.FirstName,
+				volunteer.LastName, volunteer.Neighborhood, volunteer.City,
+			)
+			socialAction.AddSocialActionVolunteer(socialActionVolunteer)
 		}
-
 	}
+	socialAction.Updated()
 	err = uc.socialActionRepository.Update(ctx, socialAction)
 	if err != nil {
 		return err

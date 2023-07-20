@@ -25,7 +25,7 @@ func TestUpdateSocialAction(t *testing.T) {
 	idGenerator := fakes.NewIDGeneratorFake()
 	createVolunteerUseCase := usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator)
 	createSocialActionUseCase := usecase.NewCreateSocialActionUseCase(volunteerRepository, socialActionRepository, idGenerator)
-	updateSocialActionUseCase := usecase.NewUpdateSocialActionUseCase(socialActionRepository)
+	updateSocialActionUseCase := usecase.NewUpdateSocialActionUseCase(socialActionRepository, volunteerRepository)
 	findSocialActionUseCase := usecase.NewFindSocialActionUseCase(socialActionRepository)
 	volunteer, err := createVolunteerUseCase.Execute(context.Background(), &usecase.CreateVolunteerInput{
 		FirstName:    "Teste",
@@ -130,6 +130,50 @@ func TestUpdateSocialAction(t *testing.T) {
 						LastName:       "updated volunteer last name",
 						Neighborhood:   "updated volunteer neighborhood",
 						City:           "updated volunteer city",
+					},
+				},
+			},
+		},
+		{
+			name: "Should create a new volunteer to a social action already created",
+			args: args{
+				ctx: context.Background(),
+				input: &usecase.UpdateSocialActionInput{
+					SocialActionsVolunteers: []usecase.UpdateSocialActionVolunteersInput{
+						{
+							ID: volunteer.ID,
+						},
+					},
+				},
+				CreateSocialActionInput: &usecase.CreateSocialActionInput{
+					Name:         "fake social action name",
+					Organizer:    "fake organizer",
+					Description:  "fake description",
+					StreetLine:   "fake street line",
+					StreetNumber: "fake street number",
+					Neighborhood: "fake neighborhood",
+					City:         "fake city",
+				},
+			},
+			want: &entity.SocialAction{
+				ID:          "fakeUUID",
+				Name:        "fake social action name",
+				Organizer:   "fake organizer",
+				Description: "fake description",
+				Address: &entity.Address{
+					StreetLine:   "fake street line",
+					StreetNumber: "fake street number",
+					Neighborhood: "fake neighborhood",
+					City:         "fake city",
+				},
+				SocialActionVolunteer: []*entity.SocialActionVolunteer{
+					{
+						ID:             "fakeUUID",
+						SocialActionID: "fakeUUID",
+						FirstName:      "Teste",
+						LastName:       "da Silva",
+						Neighborhood:   "Bairro de teste",
+						City:           "Testelandia",
 					},
 				},
 			},
