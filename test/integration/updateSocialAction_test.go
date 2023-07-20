@@ -25,7 +25,7 @@ func TestUpdateSocialAction(t *testing.T) {
 	idGenerator := fakes.NewIDGeneratorFake()
 	//createVolunteerUseCase := usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator)
 	createSocialActionUseCase := usecase.NewCreateSocialActionUseCase(volunteerRepository, socialActionRepository, idGenerator)
-	updateSocialActionUseCase := usecase.NewUpdateSocialActionUseCase(socialActionRepository, idGenerator)
+	updateSocialActionUseCase := usecase.NewUpdateSocialActionUseCase(socialActionRepository)
 	findSocialActionUseCase := usecase.NewFindSocialActionUseCase(socialActionRepository)
 	type args struct {
 		ctx   context.Context

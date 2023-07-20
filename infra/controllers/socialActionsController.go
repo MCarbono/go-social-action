@@ -15,6 +15,7 @@ type SocialActionController struct {
 	*usecase.FindSocialActionUseCase
 	*usecase.FindSocialActionsUseCase
 	*usecase.DeleteSocialActionUseCase
+	*usecase.UpdateSocialActionUseCase
 }
 
 func (c *SocialActionController) Create(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +60,27 @@ func (c *SocialActionController) GetAll(w http.ResponseWriter, r *http.Request) 
 func (c *SocialActionController) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	err := c.DeleteSocialActionUseCase.Execute(r.Context(), id)
+	if err != nil {
+		responses.ResponseWithErr(w, err)
+		return
+	}
+	responses.NoContent(w)
+}
+
+func (c *SocialActionController) Update(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.BadRequest(w, err.Error())
+		return
+	}
+	var input usecase.UpdateSocialActionInput
+	err = json.Unmarshal(body, &input)
+	if err != nil {
+		responses.BadRequest(w, err.Error())
+		return
+	}
+	id := chi.URLParam(r, "id")
+	err = c.UpdateSocialActionUseCase.Execute(r.Context(), id, &input)
 	if err != nil {
 		responses.ResponseWithErr(w, err)
 		return

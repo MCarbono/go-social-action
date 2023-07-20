@@ -3,21 +3,17 @@ package usecase
 import (
 	"context"
 	"go-social-action/application/repository"
-	"go-social-action/idGenerator"
 )
 
 type UpdateSocialActionUseCase struct {
 	socialActionRepository repository.SocialActionRepository
-	idGenerator            idGenerator.IDGenerator
 }
 
 func NewUpdateSocialActionUseCase(
 	socialActionRepository repository.SocialActionRepository,
-	idGenerator idGenerator.IDGenerator,
 ) *UpdateSocialActionUseCase {
 	return &UpdateSocialActionUseCase{
 		socialActionRepository: socialActionRepository,
-		idGenerator:            idGenerator,
 	}
 }
 
