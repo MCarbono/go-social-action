@@ -1,4 +1,3 @@
-
 run:
 	go run main.go
 
@@ -16,4 +15,3 @@ docker_down:
 
 docker_up:
 	docker compose up -d
-
