@@ -32,6 +32,7 @@ func main() {
 	}
 	socialActionController := controllers.SocialActionController{
 		CreateSocialActionUseCase: usecase.NewCreateSocialActionUseCase(volunteerRepository, socialActionRepository, idGenerator),
+		FindSocialActionUseCase:   usecase.NewFindSocialActionUseCase(socialActionRepository),
 	}
 	r := router.New(volunteerController, socialActionController)
 	fmt.Printf("Starting the server on port %v\n", cfg.ServerPort)

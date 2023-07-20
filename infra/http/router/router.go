@@ -20,6 +20,7 @@ func New(volunteerController controllers.VolunteerController, socialActionContro
 	})
 	r.Route("/social-actions", func(r chi.Router) {
 		r.Post("/", socialActionController.Create)
+		r.Get("/{id}", socialActionController.GetByID)
 	})
 	return r
 }
