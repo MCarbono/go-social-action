@@ -25,11 +25,15 @@ func main() {
 	defer db.Close()
 	idGenerator := idGenerator.New()
 	volunteerRepository := repository.NewVolunteerRepositoryPostgres(db)
+	socialActionRepository := repository.NewSocialActionRepositoryPostgres(db)
 	volunteerController := controllers.VolunteerController{
 		CreateVolunteerUseCase: usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator),
 		FindVolunteerUseCase:   usecase.NewFindVolunteerUseCase(volunteerRepository),
 	}
-	r := router.New(volunteerController)
+	socialActionController := controllers.SocialActionController{
+		CreateSocialActionUseCase: usecase.NewCreateSocialActionUseCase(volunteerRepository, socialActionRepository, idGenerator),
+	}
+	r := router.New(volunteerController, socialActionController)
 	fmt.Printf("Starting the server on port %v\n", cfg.ServerPort)
 	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
 }

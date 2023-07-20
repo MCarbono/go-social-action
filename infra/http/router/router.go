@@ -9,14 +9,17 @@ import (
 	chiMiddleware "github.com/go-chi/chi/middleware"
 )
 
-func New(volunteerController controllers.VolunteerController) http.Handler {
+func New(volunteerController controllers.VolunteerController, socialActionController controllers.SocialActionController) http.Handler {
 	r := chi.NewRouter()
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.StripSlashes)
-	r.Use(middleware.ContentTypeResponse)
+	r.Use(middleware.JSONContentTypeResponse)
 	r.Route("/volunteers", func(r chi.Router) {
 		r.Post("/", volunteerController.Create)
 		r.Get("/{id}", volunteerController.GetByID)
+	})
+	r.Route("/social-actions", func(r chi.Router) {
+		r.Post("/", socialActionController.Create)
 	})
 	return r
 }
