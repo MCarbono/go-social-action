@@ -23,5 +23,5 @@ func (uc *FindSocialActionUseCase) Execute(ctx context.Context, ID string) (*ent
 	if err != nil {
 		return nil, err
 	}
-	return socialAction, err
+	return socialAction, nil
 }
