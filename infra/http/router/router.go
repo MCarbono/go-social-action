@@ -22,6 +22,7 @@ func New(volunteerController controllers.VolunteerController, socialActionContro
 		r.Post("/", socialActionController.Create)
 		r.Get("/", socialActionController.GetAll)
 		r.Get("/{id}", socialActionController.GetByID)
+		r.Delete("/{id}", socialActionController.Delete)
 	})
 	return r
 }

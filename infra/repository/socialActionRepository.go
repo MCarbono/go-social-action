@@ -45,9 +45,6 @@ func (r *SocialActionRepositoryPostgres) Create(ctx context.Context, socialActio
 
 func (r *SocialActionRepositoryPostgres) Delete(ctx context.Context, ID string) error {
 	_, err := r.DB.Exec("DELETE FROM social_actions WHERE id = $1", ID)
-	if err == sql.ErrNoRows {
-		return appError.NotFoundError{Message: "social action not found"}
-	}
 	return err
 }
 
