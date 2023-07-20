@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type SocialAction struct {
 	ID                    string                   `json:"id"`
@@ -63,7 +66,7 @@ func NewSocialAction(ID, name, organizer, description string, address *Address, 
 }
 
 func (s *SocialAction) AddSocialActionVolunteers(volunteers []*SocialActionVolunteer) {
-	s.SocialActionVolunteer = volunteers
+	s.SocialActionVolunteer = append(s.SocialActionVolunteer, volunteers...)
 }
 
 func (s *SocialAction) UpdateName(name string) {
@@ -103,4 +106,30 @@ func (s *SocialAction) UpdateCity(city string) {
 
 func (s *SocialAction) updated() {
 	s.UpdatedAt = time.Now().UTC()
+}
+
+func (s *SocialAction) UpdateVolunteer(ID, firstName, lastName, neighborhood, city string) error {
+	var volunteer *SocialActionVolunteer
+	for _, v := range s.SocialActionVolunteer {
+		if v.ID == ID {
+			volunteer = v
+			break
+		}
+	}
+	if volunteer == nil {
+		return errors.New("Volunteer not found")
+	}
+	if firstName != "" {
+		volunteer.FirstName = firstName
+	}
+	if lastName != "" {
+		volunteer.LastName = lastName
+	}
+	if neighborhood != "" {
+		volunteer.Neighborhood = neighborhood
+	}
+	if city != "" {
+		volunteer.City = city
+	}
+	return nil
 }

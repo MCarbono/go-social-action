@@ -55,7 +55,25 @@ func (r *SocialActionRepositoryPostgres) Update(ctx context.Context, socialActio
 		socialAction.Name, socialAction.Organizer, socialAction.Description, socialAction.Address.StreetLine, socialAction.Address.StreetNumber,
 		socialAction.Address.Neighborhood, socialAction.Address.City, socialAction.UpdatedAt, socialAction.ID,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+
+	for _, v := range socialAction.SocialActionVolunteer {
+		_, err := r.DB.Exec(
+			`INSERT INTO social_actions_volunteers (id, social_action_id, first_name, last_name, neighborhood, city) VALUES ($1, $2, $3, $4, $5, $6) 
+			ON CONFLICT (id, social_action_id) DO UPDATE SET 
+			first_name = EXCLUDED.first_name,
+			last_name = EXCLUDED.last_name,
+			neighborhood = EXCLUDED.neighborhood,
+			city = EXCLUDED.city`,
+			v.ID, socialAction.ID, v.FirstName, v.LastName, v.Neighborhood, v.City,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *SocialActionRepositoryPostgres) FindByID(ctx context.Context, ID string) (*entity.SocialAction, error) {

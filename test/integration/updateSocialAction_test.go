@@ -23,13 +23,24 @@ func TestUpdateSocialAction(t *testing.T) {
 	volunteerRepository := repository.NewVolunteerRepositoryPostgres(db)
 	socialActionRepository := repository.NewSocialActionRepositoryPostgres(db)
 	idGenerator := fakes.NewIDGeneratorFake()
-	//createVolunteerUseCase := usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator)
+	createVolunteerUseCase := usecase.NewCreateVolunteerUseCase(volunteerRepository, idGenerator)
 	createSocialActionUseCase := usecase.NewCreateSocialActionUseCase(volunteerRepository, socialActionRepository, idGenerator)
 	updateSocialActionUseCase := usecase.NewUpdateSocialActionUseCase(socialActionRepository)
 	findSocialActionUseCase := usecase.NewFindSocialActionUseCase(socialActionRepository)
+	volunteer, err := createVolunteerUseCase.Execute(context.Background(), &usecase.CreateVolunteerInput{
+		FirstName:    "Teste",
+		LastName:     "da Silva",
+		Neighborhood: "Bairro de teste",
+		City:         "Testelandia",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Exec("DELETE FROM volunteers;")
 	type args struct {
 		ctx   context.Context
 		input *usecase.UpdateSocialActionInput
+		*usecase.CreateSocialActionInput
 	}
 	type test struct {
 		name string
@@ -50,6 +61,15 @@ func TestUpdateSocialAction(t *testing.T) {
 					Neighborhood: "updated neighborhood",
 					City:         "updated city",
 				},
+				CreateSocialActionInput: &usecase.CreateSocialActionInput{
+					Name:         "fake social action name",
+					Organizer:    "fake organizer",
+					Description:  "fake description",
+					StreetLine:   "fake street line",
+					StreetNumber: "fake street number",
+					Neighborhood: "fake neighborhood",
+					City:         "fake city",
+				},
 			},
 			want: &entity.SocialAction{
 				ID:          "fakeUUID",
@@ -65,21 +85,61 @@ func TestUpdateSocialAction(t *testing.T) {
 				SocialActionVolunteer: []*entity.SocialActionVolunteer{},
 			},
 		},
+		{
+			name: "Should update firstName, lastName, neighborhood and city of a social action volunteer",
+			args: args{
+				ctx: context.Background(),
+				input: &usecase.UpdateSocialActionInput{
+					SocialActionsVolunteers: []usecase.UpdateSocialActionVolunteersInput{
+						{
+							ID:           volunteer.ID,
+							FirstName:    "updated volunteer first name",
+							LastName:     "updated volunteer last name",
+							Neighborhood: "updated volunteer neighborhood",
+							City:         "updated volunteer city",
+						},
+					},
+				},
+				CreateSocialActionInput: &usecase.CreateSocialActionInput{
+					Name:                    "fake social action name",
+					Organizer:               "fake organizer",
+					Description:             "fake description",
+					StreetLine:              "fake street line",
+					StreetNumber:            "fake street number",
+					Neighborhood:            "fake neighborhood",
+					City:                    "fake city",
+					SocialActionsVolunteers: []string{volunteer.ID},
+				},
+			},
+			want: &entity.SocialAction{
+				ID:          "fakeUUID",
+				Name:        "fake social action name",
+				Organizer:   "fake organizer",
+				Description: "fake description",
+				Address: &entity.Address{
+					StreetLine:   "fake street line",
+					StreetNumber: "fake street number",
+					Neighborhood: "fake neighborhood",
+					City:         "fake city",
+				},
+				SocialActionVolunteer: []*entity.SocialActionVolunteer{
+					{
+						ID:             "fakeUUID",
+						SocialActionID: "fakeUUID",
+						FirstName:      "updated volunteer first name",
+						LastName:       "updated volunteer last name",
+						Neighborhood:   "updated volunteer neighborhood",
+						City:           "updated volunteer city",
+					},
+				},
+			},
+		},
 	}
 	for _, scenario := range tests {
 		t.Run(scenario.name, func(t *testing.T) {
 			defer db.Exec("DELETE FROM social_actions_volunteers;")
 			defer db.Exec("DELETE FROM social_actions;")
-			defer db.Exec("DELETE FROM volunteers;")
-			socialActionCreated, err := createSocialActionUseCase.Execute(scenario.args.ctx, &usecase.CreateSocialActionInput{
-				Name:         "fake social action name",
-				Organizer:    "fake organizer",
-				Description:  "fake description",
-				StreetLine:   "fake street line",
-				StreetNumber: "fake street number",
-				Neighborhood: "fake neighborhood",
-				City:         "fake city",
-			})
+			socialActionCreated, err := createSocialActionUseCase.Execute(scenario.args.ctx, scenario.args.CreateSocialActionInput)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -92,7 +152,7 @@ func TestUpdateSocialAction(t *testing.T) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(scenario.want, got, cmpopts.IgnoreFields(entity.SocialAction{}, "CreatedAt", "UpdatedAt")); diff != "" {
-				t.Errorf("Create social action mismatch (-want +got):\n%v", diff)
+				t.Errorf("Update social action mismatch (-want +got):\n%v", diff)
 			}
 		})
 	}
