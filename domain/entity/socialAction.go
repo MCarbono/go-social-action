@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"errors"
 	"time"
 )
 
@@ -108,28 +107,26 @@ func (s *SocialAction) updated() {
 	s.UpdatedAt = time.Now().UTC()
 }
 
-func (s *SocialAction) UpdateVolunteer(ID, firstName, lastName, neighborhood, city string) error {
-	var volunteer *SocialActionVolunteer
+func (s *SocialAction) FindVolunteer(ID string) *SocialActionVolunteer {
 	for _, v := range s.SocialActionVolunteer {
 		if v.ID == ID {
-			volunteer = v
-			break
+			return v
 		}
 	}
-	if volunteer == nil {
-		return errors.New("Volunteer not found")
-	}
+	return nil
+}
+
+func (s *SocialActionVolunteer) Update(firstName, lastName, neighborhood, city string) {
 	if firstName != "" {
-		volunteer.FirstName = firstName
+		s.FirstName = firstName
 	}
 	if lastName != "" {
-		volunteer.LastName = lastName
+		s.LastName = lastName
 	}
 	if neighborhood != "" {
-		volunteer.Neighborhood = neighborhood
+		s.Neighborhood = neighborhood
 	}
 	if city != "" {
-		volunteer.City = city
+		s.City = city
 	}
-	return nil
 }

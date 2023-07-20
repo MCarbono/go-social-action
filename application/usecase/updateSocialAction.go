@@ -45,15 +45,15 @@ func (uc *UpdateSocialActionUseCase) Execute(ctx context.Context, ID string, inp
 	}
 	if len(input.SocialActionsVolunteers) > 0 {
 		for i := 0; i < len(input.SocialActionsVolunteers); i++ {
-			if input.SocialActionsVolunteers[i].ID != "" {
-				socialAction.UpdateVolunteer(
-					input.SocialActionsVolunteers[i].ID,
+			socialActionVolunteer := socialAction.FindVolunteer(input.SocialActionsVolunteers[i].ID)
+			if socialActionVolunteer != nil {
+				socialActionVolunteer.Update(
 					input.SocialActionsVolunteers[i].FirstName, input.SocialActionsVolunteers[i].LastName,
-					input.SocialActionsVolunteers[i].Neighborhood, input.SocialActionsVolunteers[i].City,
-				)
+					input.SocialActionsVolunteers[i].Neighborhood, input.SocialActionsVolunteers[i].City)
 				continue
 			}
 		}
+
 	}
 	err = uc.socialActionRepository.Update(ctx, socialAction)
 	if err != nil {
