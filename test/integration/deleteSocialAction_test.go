@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"go-social-action/application/appError"
 	"go-social-action/application/usecase"
 	"go-social-action/idGenerator"
 	"go-social-action/infra/database"
@@ -64,14 +65,14 @@ func TestDeleteSocialAction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantErr := "sql: no rows in result set"
+	wantErr := appError.NotFoundError{Message: "social action not found"}
 	socialActionDeleted, err := findSocialActionUseCase.Execute(ctx, socialAction.ID)
 	if socialActionDeleted != nil {
 		t.Errorf("TestDeleteSocialAction failed. Should not returned a social action, but got: %v", socialActionDeleted)
 		return
 	}
-	if diff := cmp.Diff(wantErr, err.Error()); diff != "" {
-		t.Errorf("Delete social action mismatch (-want +got):\n%v", diff)
+	if diff := cmp.Diff(err, wantErr); diff != "" {
+		t.Errorf("Delete social action mismatch (-err +wantErr):\n%v", diff)
 		return
 	}
 	rows, err := db.Query("SELECT * FROM social_actions_volunteers WHERE id IN ($1, $2)", firstVolunteer.ID, secondVolunteer.ID)

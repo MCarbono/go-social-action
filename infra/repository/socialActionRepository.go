@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+
+	"go-social-action/application/appError"
 	"go-social-action/domain/entity"
 )
 
@@ -43,6 +45,9 @@ func (r *SocialActionRepositoryPostgres) Create(ctx context.Context, socialActio
 
 func (r *SocialActionRepositoryPostgres) Delete(ctx context.Context, ID string) error {
 	_, err := r.DB.Exec("DELETE FROM social_actions WHERE id = $1", ID)
+	if err == sql.ErrNoRows {
+		return appError.NotFoundError{Message: "social action not found"}
+	}
 	return err
 }
 
@@ -62,6 +67,9 @@ func (r *SocialActionRepositoryPostgres) FindByID(ctx context.Context, ID string
 	if err := row.Scan(&socialActionModel.ID, &socialActionModel.Name, &socialActionModel.Organizer,
 		&socialActionModel.Description, &socialActionModel.StreetLine, &socialActionModel.StreetNumber,
 		&socialActionModel.Neighborhood, &socialActionModel.City, &socialActionModel.CreatedAt, &socialActionModel.UpdatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, appError.NotFoundError{Message: "social action not found"}
+		}
 		return nil, err
 	}
 	rows, err := r.DB.Query("SELECT * FROM social_actions_volunteers WHERE social_action_id = $1", socialActionModel.ID)
