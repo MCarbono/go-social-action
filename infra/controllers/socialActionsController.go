@@ -13,6 +13,7 @@ import (
 type SocialActionController struct {
 	*usecase.CreateSocialActionUseCase
 	*usecase.FindSocialActionUseCase
+	*usecase.FindSocialActionsUseCase
 }
 
 func (c *SocialActionController) Create(w http.ResponseWriter, r *http.Request) {
@@ -43,4 +44,13 @@ func (c *SocialActionController) GetByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	responses.Ok(w, volunteer)
+}
+
+func (c *SocialActionController) GetAll(w http.ResponseWriter, r *http.Request) {
+	volunteers, err := c.FindSocialActionsUseCase.Execute(r.Context())
+	if err != nil {
+		responses.ResponseWithErr(w, err)
+		return
+	}
+	responses.Ok(w, volunteers)
 }
