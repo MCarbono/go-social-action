@@ -31,5 +31,7 @@ CREATE TABLE social_actions_volunteers (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     neighborhood TEXT,
-    city TEXT
+    city TEXT,
+    CONSTRAINT unique_id_social_action_id
+    UNIQUE (id, social_action_id)
 );
