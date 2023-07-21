@@ -33,7 +33,7 @@ func (uc *CreateSocialActionUseCase) Execute(ctx context.Context, input *CreateS
 		input.Description, socialActionAddress, time.Now().UTC(), time.Now().UTC(),
 	)
 	if len(input.SocialActionsVolunteers) > 0 {
-		volunteers, err := uc.volunteerRepository.Find(ctx, input.SocialActionsVolunteers)
+		volunteers, err := uc.volunteerRepository.FindByIDS(ctx, input.SocialActionsVolunteers)
 		if err != nil {
 			return nil, err
 		}

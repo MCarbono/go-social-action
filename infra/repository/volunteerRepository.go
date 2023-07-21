@@ -38,7 +38,7 @@ func (r *VolunteerRepositoryPostgres) FindByID(ctx context.Context, ID string) (
 	return volunteer, nil
 }
 
-func (r *VolunteerRepositoryPostgres) Find(ctx context.Context, IDS []string) ([]*entity.Volunteer, error) {
+func (r *VolunteerRepositoryPostgres) FindByIDS(ctx context.Context, IDS []string) ([]*entity.Volunteer, error) {
 	placeholders := make([]string, len(IDS))
 	for i := range IDS {
 		placeholders[i] = fmt.Sprintf("$%d", i+1)
