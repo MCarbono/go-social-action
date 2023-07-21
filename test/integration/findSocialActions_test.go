@@ -3,11 +3,13 @@ package integration
 import (
 	"context"
 	"go-social-action/application/usecase"
+	"go-social-action/configs"
 	"go-social-action/domain/entity"
 	"go-social-action/idGenerator"
 	"go-social-action/infra/database"
 	"go-social-action/infra/repository"
 	"go-social-action/test/assets/fakes"
+	"log"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -16,8 +18,11 @@ import (
 
 func TestFindSocialActions(t *testing.T) {
 	ctx := context.Background()
-	config := database.NewPostgresConfig("localhost", "5432", "go-social-action", "go", "go-social-action", "disable")
-	db, err := database.Open(config)
+	cfg, err := configs.LoadEnvConfig("../../.env")
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err := database.Open(cfg.PSQL)
 	if err != nil {
 		t.Fatal(err)
 	}

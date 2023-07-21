@@ -12,9 +12,9 @@ type config struct {
 	ServerPort string
 }
 
-func LoadEnvConfig() (config, error) {
+func LoadEnvConfig(path string) (config, error) {
 	var cfg config
-	err := godotenv.Load()
+	err := godotenv.Load(path)
 	if err != nil {
 		return cfg, err
 	}
