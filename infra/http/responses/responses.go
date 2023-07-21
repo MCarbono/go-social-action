@@ -8,8 +8,6 @@ import (
 
 func ResponseWithErr(w http.ResponseWriter, err error) {
 	switch e := err.(type) {
-	case appError.FieldsValidationError:
-		UnprocessableEntity(w, e)
 	case appError.NotFoundError:
 		NotFound(w, e)
 	default:
@@ -19,11 +17,6 @@ func ResponseWithErr(w http.ResponseWriter, err error) {
 
 func InternalServerError(w http.ResponseWriter, i interface{}) {
 	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(i)
-}
-
-func UnprocessableEntity(w http.ResponseWriter, i interface{}) {
-	w.WriteHeader(http.StatusUnprocessableEntity)
 	json.NewEncoder(w).Encode(i)
 }
 
