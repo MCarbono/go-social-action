@@ -105,6 +105,20 @@ na raiz do projeto, após subir o docker do banco de dados, digite um dos comand
     # Go comando
     $ go test ./test/integration -v
 ```
+
+### Todos
+
+Para rodas todos os teste, digite um dos comandos abaixo:
+
+```bash
+    # Makefile comando
+    $ make tests
+```
+
+```bash
+    # Go comando
+    $ go test ./... -v
+```
 ---
 
 <a id="Endpoints"></a> 
